@@ -6,4 +6,3 @@ env/
 .ipynb_checkpoints/
 
 /data/raw/imdb/
-/data/raw/tmdb/details/
