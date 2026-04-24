@@ -20,8 +20,10 @@ with measures such as:
 The pipeline currently uses:
 
 - **MovieLens** – main behavioral source for ratings, tags, movies, and external links
+[F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems (TiiS) 5, 4: 19:1–19:19. <https://doi.org/10.1145/2827872>]
 - **IMDb** – enrichment for runtime, release year, ratings, votes, and directors
 - **TMDb** – enrichment for language, popularity, company, country, budget, and revenue
+[This product uses the TMDB API but is not endorsed or certified by TMDB.]
 
 ## Pipeline phases
 
@@ -78,12 +80,5 @@ python src/phase2_imdb_enrichment.py
 python src/phase3_filter_and_rebuild.py
 python src/phase4_tmdb_enrichment.py
 python src/phase5_finalize_exports.py
-
-
-
-This product uses the TMDB API but is not endorsed or certified by TMDB.
-
-MovieLens dataset:
-F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems (TiiS) 5, 4: 19:1–19:19. <https://doi.org/10.1145/2827872>
 
 
