@@ -83,11 +83,12 @@ python src/phase3_filter_and_rebuild.py
 python src/phase4_tmdb_enrichment.py
 python src/phase5_finalize_exports.py
 ```
+
 ## Final output
 
 The final warehouse files are:
 
-data/final/dim_date.csv
-data/final/dim_movie.csv
-data/final/dim_genre.csv
-data/final/fact_movie_month.csv
+- data/final/dim_date.csv
+- data/final/dim_movie.csv
+- data/final/dim_genre.csv
+- data/final/fact_movie_month.csv
