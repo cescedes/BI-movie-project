@@ -76,13 +76,13 @@ Creates the final cleaned files for Tableau in the `data/final/` folder.
 
 Run the phases in order:
 
-` ```bash `
+```bash 
 python src/phase1_movielens.py
 python src/phase2_imdb_enrichment.py
 python src/phase3_filter_and_rebuild.py
 python src/phase4_tmdb_enrichment.py
 python src/phase5_finalize_exports.py
-` ``` `
+```
 ## Final output
 
 The final warehouse files are:
