@@ -92,6 +92,6 @@ python src/run_pipeline.py
 
 The final warehouse files are:
 
-- data/final/dim_date.csv
-- data/final/dim_movie.csv
-- data/final/fact_movie_month.csv
+- `data/final/dim_date.csv`
+- `data/final/dim_movie.csv`
+- `data/final/fact_movie_month.csv`
