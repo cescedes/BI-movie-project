@@ -1,19 +1,10 @@
 # BI Movie Project – Data Processing Pipeline
 
-This project builds a small movie-oriented BI warehouse for analyzing **monthly movie popularity and audience engagement**.
+This project builds a small movie-oriented BI warehouse for analyzing **monthly movie popularity, audience engagement, and audience reception**.
 
 ## Project goal
 
-The pipeline integrates public movie datasets and transforms them into a Tableau-ready warehouse with a monthly fact table and supporting dimensions.
-
-The final warehouse is centered on a monthly fact table:
-
-**one row = one movie in one month**
-
-with measures such as:
-- `rating_count`
-- `avg_rating`
-- `tag_count`
+The pipeline integrates public movie datasets and transforms them into a Tableau-ready warehouse with a monthly fact table and supporting dimensions. The final warehouse uses a fact table at the grain of one movie in one month, supported by Date and Movie dimensions, with additional analytical dimensions such as Genre, Director, Language, and Release Year modeled as attributes of the Movie dimension.
 
 ## Data sources
 
