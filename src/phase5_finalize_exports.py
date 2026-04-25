@@ -131,24 +131,6 @@ def standardize_fact_movie_month(fact_movie_month: pd.DataFrame) -> pd.DataFrame
     return df
 
 
-def build_dim_genre(dim_movie: pd.DataFrame) -> pd.DataFrame:
-    if "primary_genre" not in dim_movie.columns:
-        return pd.DataFrame(columns=["genre_key", "genre_name"])
-
-    genres = (
-        dim_movie["primary_genre"]
-        .fillna("Unknown")
-        .drop_duplicates()
-        .sort_values()
-        .reset_index(drop=True)
-        .to_frame(name="genre_name")
-    )
-
-    genres["genre_key"] = range(1, len(genres) + 1)
-    genres = genres[["genre_key", "genre_name"]]
-    return genres
-
-
 def validate_model(dim_movie: pd.DataFrame, dim_date: pd.DataFrame, fact: pd.DataFrame) -> None:
     duplicate_fact_rows = fact.duplicated(subset=["movie_key", "month_key"]).sum()
     null_movie_keys = fact["movie_key"].isna().sum()
@@ -180,11 +162,10 @@ def main() -> None:
     final_dim_movie = standardize_dim_movie(dim_movie)
     final_dim_date = standardize_dim_date(dim_date)
     final_fact = standardize_fact_movie_month(fact_movie_month)
-    final_dim_genre = build_dim_genre(final_dim_movie)
+
 
     final_dim_movie.to_csv(FINAL_DIM_MOVIE_PATH, index=False)
     final_dim_date.to_csv(FINAL_DIM_DATE_PATH, index=False)
-    final_dim_genre.to_csv(FINAL_DIM_GENRE_PATH, index=False)
     final_fact.to_csv(FINAL_FACT_MOVIE_MONTH_PATH, index=False)
 
     validate_model(final_dim_movie, final_dim_date, final_fact)
@@ -192,7 +173,6 @@ def main() -> None:
     print("\nPhase 5 completed successfully.")
     print(f"Final dim_movie written to: {FINAL_DIM_MOVIE_PATH}")
     print(f"Final dim_date written to: {FINAL_DIM_DATE_PATH}")
-    print(f"Final dim_genre written to: {FINAL_DIM_GENRE_PATH}")
     print(f"Final fact written to: {FINAL_FACT_MOVIE_MONTH_PATH}")
 
 
