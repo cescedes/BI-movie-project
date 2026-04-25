@@ -16,13 +16,11 @@
   "homepage": "",
   "id": 1578,
   "imdb_id": "tt0081398",
-  "origin_country": [
-    "US"
-  ],
+  "origin_country": [],
   "original_language": "en",
   "original_title": "Raging Bull",
   "overview": "The life of boxer Jake LaMotta, whose violence and temper that led him to the top in the ring destroyed his life outside of it.",
-  "popularity": 5.4246,
+  "popularity": 7.4737,
   "poster_path": "/1WV7WlTS8LI1L5NkCgjWT9GSW3O.jpg",
   "production_companies": [
     {
@@ -48,19 +46,13 @@
   "revenue": 23380203,
   "runtime": 129,
   "softcore": false,
-  "spoken_languages": [
-    {
-      "english_name": "English",
-      "iso_639_1": "en",
-      "name": "English"
-    }
-  ],
+  "spoken_languages": [],
   "status": "Released",
   "tagline": "I don’t go down for nobody.",
   "title": "Raging Bull",
   "video": false,
   "vote_average": 7.903,
-  "vote_count": 4726,
+  "vote_count": 4729,
   "tmdb_id": 1578,
   "fetch_status": "ok"
 }

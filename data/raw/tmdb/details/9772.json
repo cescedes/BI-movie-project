@@ -22,7 +22,7 @@
   "original_language": "en",
   "original_title": "Air Force One",
   "overview": "When Russian neo-nationalists hijack Air Force One, the world's most secure and extraordinary aircraft, the President is faced with a nearly impossible decision to give in to terrorist demands or sacrifice not only the country's dignity, but the lives of his wife and daughter.",
-  "popularity": 5.8324,
+  "popularity": 6.9002,
   "poster_path": "/evO1iENjLpUnbwjnt5XK85jRYob.jpg",
   "production_companies": [
     {
@@ -44,14 +44,14 @@
   "softcore": false,
   "spoken_languages": [
     {
-      "english_name": "English",
-      "iso_639_1": "en",
-      "name": "English"
-    },
-    {
       "english_name": "Russian",
       "iso_639_1": "ru",
       "name": "Pусский"
+    },
+    {
+      "english_name": "English",
+      "iso_639_1": "en",
+      "name": "English"
     }
   ],
   "status": "Released",
@@ -59,7 +59,7 @@
   "title": "Air Force One",
   "video": false,
   "vote_average": 6.47,
-  "vote_count": 3285,
+  "vote_count": 3286,
   "tmdb_id": 9772,
   "fetch_status": "ok"
 }

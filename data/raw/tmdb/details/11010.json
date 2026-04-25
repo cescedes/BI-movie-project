@@ -26,7 +26,7 @@
   "original_language": "it",
   "original_title": "Il postino",
   "overview": "Simple Italian postman learns to love poetry while delivering mail to a famous poet; he uses this to woo local beauty Beatrice.",
-  "popularity": 2.0,
+  "popularity": 1.8972,
   "poster_path": "/cUaCpjVDefYShKyLmkcDsiPaBHn.jpg",
   "production_companies": [
     {
@@ -94,8 +94,8 @@
   "tagline": "Dreams do come true.",
   "title": "The Postman",
   "video": false,
-  "vote_average": 7.914,
-  "vote_count": 1210,
+  "vote_average": 7.915,
+  "vote_count": 1211,
   "tmdb_id": 11010,
   "fetch_status": "ok"
 }

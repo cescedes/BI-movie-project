@@ -145,6 +145,8 @@ def merge_tmdb_into_dim_movie(dim_movie: pd.DataFrame, tmdb_movies: pd.DataFrame
     df = dim_movie.copy()
     df["tmdbId"] = pd.to_numeric(df["tmdbId"], errors="coerce").astype("Int64")
 
+    tmdb_movies = tmdb_movies.drop_duplicates(subset=["tmdb_id"]).copy()
+
     enriched = df.merge(
         tmdb_movies,
         left_on="tmdbId",
@@ -164,14 +166,15 @@ def quality_report(enriched: pd.DataFrame) -> None:
     matched = enriched["tmdb_fetch_status"].eq("ok").sum() if "tmdb_fetch_status" in enriched.columns else 0
     has_language = enriched["tmdb_original_language"].notna().sum() if "tmdb_original_language" in enriched.columns else 0
     has_company = enriched["tmdb_primary_company"].notna().sum() if "tmdb_primary_company" in enriched.columns else 0
-
+    failed_fetches = enriched["tmdb_fetch_status"].eq("not_found").sum() if "tmdb_fetch_status" in enriched.columns else 0
+    
     print("\nTMDb enrichment report")
     print("-" * 30)
     print(f"Rows in dim_movie: {total:,}")
     print(f"Matched TMDb details: {matched:,} ({matched / total:.1%})" if total else "Matched TMDb details: 0")
     print(f"Rows with language:   {has_language:,} ({has_language / total:.1%})" if total else "Rows with language: 0")
     print(f"Rows with company:    {has_company:,} ({has_company / total:.1%})" if total else "Rows with company: 0")
-
+    print(f"Rows with TMDb not_found: {failed_fetches:,} ({failed_fetches / total:.1%})" if total else "Rows with TMDb not_found: 0")
 
 def main() -> None:
     ensure_directories(TMDB_DETAILS_JSON_DIR, STAGING_TMDB_MOVIES_PATH.parent)

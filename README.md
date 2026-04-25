@@ -1,10 +1,10 @@
 # BI Movie Project – Data Processing Pipeline
 
-This project builds a small movie-oriented BI warehouse for analyzing **monthly movie popularity and audience sentiment/activity**.
+This project builds a small movie-oriented BI warehouse for analyzing **monthly movie popularity and audience engagement**.
 
 ## Project goal
 
-The pipeline integrates public movie datasets and transforms them into a Tableau-ready star schema.
+The pipeline integrates public movie datasets and transforms them into a Tableau-ready warehouse with a monthly fact table and supporting dimensions.
 
 The final warehouse is centered on a monthly fact table:
 
@@ -74,8 +74,7 @@ Creates the final cleaned files for Tableau in the `data/final/` folder.
 
 ## How to run
 
-Run the phases in order:
-
+Run order for full dataset build:
 ```bash 
 python src/phase1_movielens.py
 python src/phase2_imdb_enrichment.py
@@ -84,11 +83,15 @@ python src/phase4_tmdb_enrichment.py
 python src/phase5_finalize_exports.py
 ```
 
+Or run everything with:
+```bash 
+python src/run_pipeline.py
+```
+
 ## Final output
 
 The final warehouse files are:
 
 - data/final/dim_date.csv
 - data/final/dim_movie.csv
-- data/final/dim_genre.csv
 - data/final/fact_movie_month.csv

@@ -22,7 +22,7 @@
   "original_language": "en",
   "original_title": "Arachnophobia",
   "overview": "A large spider from the jungles of South America is accidentally transported in a crate with a dead body to America where it mates with a local spider. Soon after, the residents of a small California town disappear as the result of spider bites from the deadly spider offspring. It's up to a couple of doctors with the help of an insect exterminator to annihilate these eight legged freaks.",
-  "popularity": 2.9652,
+  "popularity": 3.7698,
   "poster_path": "/lHjpwv1Yv2RcGcTQb4Lc1cKw1y9.jpg",
   "production_companies": [
     {
@@ -48,10 +48,6 @@
     {
       "iso_3166_1": "US",
       "name": "United States of America"
-    },
-    {
-      "iso_3166_1": "VE",
-      "name": "Venezuela"
     }
   ],
   "release_date": "1990-07-20",
@@ -74,7 +70,7 @@
   "tagline": "Eight legs, two fangs and an attitude.",
   "title": "Arachnophobia",
   "video": false,
-  "vote_average": 6.444,
+  "vote_average": 6.4,
   "vote_count": 1513,
   "tmdb_id": 6488,
   "fetch_status": "ok"

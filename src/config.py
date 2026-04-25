@@ -36,5 +36,13 @@ FINAL_DIR = DATA_DIR / "final"
 
 FINAL_DIM_DATE_PATH = FINAL_DIR / "dim_date.csv"
 FINAL_DIM_MOVIE_PATH = FINAL_DIR / "dim_movie.csv"
-FINAL_DIM_GENRE_PATH = FINAL_DIR / "dim_genre.csv"
 FINAL_FACT_MOVIE_MONTH_PATH = FINAL_DIR / "fact_movie_month.csv"
+
+# Analysis / filtering configuration
+MIN_TOTAL_RATINGS = 20
+MIN_ACTIVE_MONTHS = 2
+MIN_RELEASE_YEAR = 2000
+USE_RELEASE_YEAR_FILTER = False
+
+# Staging helper outputs
+STAGING_MOVIE_ACTIVITY_STATS_PATH = STAGING_DIR / "movie_activity_stats.csv"

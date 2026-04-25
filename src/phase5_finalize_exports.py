@@ -14,7 +14,6 @@ from config import (
     FINAL_DIR,
     FINAL_DIM_DATE_PATH,
     FINAL_DIM_MOVIE_PATH,
-    FINAL_DIM_GENRE_PATH,
     FINAL_FACT_MOVIE_MONTH_PATH,
 )
 from utils import ensure_directories
@@ -142,6 +141,20 @@ def validate_model(dim_movie: pd.DataFrame, dim_date: pd.DataFrame, fact: pd.Dat
     orphan_movie_keys = (~fact["movie_key"].isin(valid_movie_keys)).sum()
     orphan_month_keys = (~fact["month_key"].isin(valid_month_keys)).sum()
 
+    negative_rating_count = (fact["rating_count"] < 0).sum() if "rating_count" in fact.columns else 0
+    negative_tag_count = (fact["tag_count"] < 0).sum() if "tag_count" in fact.columns else 0
+
+    if "avg_rating" in fact.columns:
+        avg_rating_numeric = pd.to_numeric(fact["avg_rating"], errors="coerce")
+        avg_rating_below_min = (avg_rating_numeric < 0.5).sum()
+        avg_rating_above_max = (avg_rating_numeric > 5.0).sum()
+    else:
+        avg_rating_below_min = 0
+        avg_rating_above_max = 0
+
+    missing_titles = dim_movie["title"].isna().sum() if "title" in dim_movie.columns else 0
+    missing_primary_genre = dim_movie["primary_genre"].isna().sum() if "primary_genre" in dim_movie.columns else 0
+
     print("\nFinal validation")
     print("-" * 30)
     print(f"Duplicate fact grain rows: {duplicate_fact_rows}")
@@ -149,6 +162,12 @@ def validate_model(dim_movie: pd.DataFrame, dim_date: pd.DataFrame, fact: pd.Dat
     print(f"Null month_key in fact: {null_month_keys}")
     print(f"Fact rows with missing movie dimension key: {orphan_movie_keys}")
     print(f"Fact rows with missing date dimension key: {orphan_month_keys}")
+    print(f"Negative rating_count rows: {negative_rating_count}")
+    print(f"Negative tag_count rows: {negative_tag_count}")
+    print(f"avg_rating rows below 0.5: {avg_rating_below_min}")
+    print(f"avg_rating rows above 5.0: {avg_rating_above_max}")
+    print(f"Movies with missing title: {missing_titles}")
+    print(f"Movies with missing primary_genre: {missing_primary_genre}")
     print(f"Final dim_movie rows: {len(dim_movie):,}")
     print(f"Final dim_date rows: {len(dim_date):,}")
     print(f"Final fact rows: {len(fact):,}")

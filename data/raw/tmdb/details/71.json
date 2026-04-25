@@ -1,6 +1,6 @@
 {
   "adult": false,
-  "backdrop_path": "/mTsbahr4SLqgVZkKRN0O8t5iA9y.jpg",
+  "backdrop_path": "/urzflyf41uySpgciGHdQzpcaMOY.jpg",
   "belongs_to_collection": null,
   "budget": 5000000,
   "genres": [
@@ -26,7 +26,7 @@
   "original_language": "en",
   "original_title": "Billy Elliot",
   "overview": "County Durham, England, 1984. The miners' strike has started and the police have started coming up from Bethnal Green, starting a class war with the lower classes suffering. Caught in the middle of the conflict is 11-year old Billy Elliot, who, after leaving his boxing club for the day, stumbles upon a ballet class and finds out that he's naturally talented. He practices with his teacher Mrs. Wilkinson for an upcoming audition in Newcastle-upon Tyne for the royal Ballet school in London.",
-  "popularity": 5.0475,
+  "popularity": 4.8279,
   "poster_path": "/mYtqgWCJiXpDeZwjVcC3OQGD8IR.jpg",
   "production_companies": [
     {
@@ -101,8 +101,8 @@
   "tagline": "Inside every one of us is a special talent waiting to come out. The trick is finding it.",
   "title": "Billy Elliot",
   "video": false,
-  "vote_average": 7.593,
-  "vote_count": 4057,
+  "vote_average": 7.6,
+  "vote_count": 4058,
   "tmdb_id": 71,
   "fetch_status": "ok"
 }

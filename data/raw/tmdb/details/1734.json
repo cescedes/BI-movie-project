@@ -31,7 +31,7 @@
   "original_language": "en",
   "original_title": "The Mummy Returns",
   "overview": "Rick and Evelyn O’Connell, along with their 8-year-old son Alex, discover the key to the legendary Scorpion King’s might: the fabled Bracelet of Anubis. Unfortunately, a newly resurrected Imhotep has designs on the bracelet as well, and isn’t above kidnapping its new bearer, Alex, to gain control of Anubis’s otherworldly army.",
-  "popularity": 17.5528,
+  "popularity": 17.8998,
   "poster_path": "/kdJsW7hcy1lrj7tdMPycTAQPAiR.jpg",
   "production_companies": [
     {
@@ -59,14 +59,6 @@
       "name": "United States of America"
     },
     {
-      "iso_3166_1": "MA",
-      "name": "Morocco"
-    },
-    {
-      "iso_3166_1": "JO",
-      "name": "Jordan"
-    },
-    {
       "iso_3166_1": "GB",
       "name": "United Kingdom"
     }
@@ -92,7 +84,7 @@
   "title": "The Mummy Returns",
   "video": false,
   "vote_average": 6.398,
-  "vote_count": 7608,
+  "vote_count": 7610,
   "tmdb_id": 1734,
   "fetch_status": "ok"
 }

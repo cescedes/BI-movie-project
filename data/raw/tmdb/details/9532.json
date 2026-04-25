@@ -23,13 +23,13 @@
   "original_language": "en",
   "original_title": "Final Destination",
   "overview": "After a teenager has a terrifying vision of him and his friends dying in a plane crash, he prevents the accident only to have Death hunt them down, one by one.",
-  "popularity": 8.4897,
+  "popularity": 9.668,
   "poster_path": "/1mXhlQMnlfvJ2frxTjZSQNnA9Vp.jpg",
   "production_companies": [
     {
-      "id": 48772,
+      "id": 3169,
       "logo_path": null,
-      "name": "Hard Eight Pictures",
+      "name": "Zide-Perry Productions",
       "origin_country": "US"
     },
     {
@@ -39,9 +39,9 @@
       "origin_country": "US"
     },
     {
-      "id": 3169,
+      "id": 48772,
       "logo_path": null,
-      "name": "Zide-Perry Productions",
+      "name": "Hard Eight Pictures",
       "origin_country": "US"
     }
   ],
@@ -72,7 +72,7 @@
   "title": "Final Destination",
   "video": false,
   "vote_average": 6.632,
-  "vote_count": 6607,
+  "vote_count": 6608,
   "tmdb_id": 9532,
   "fetch_status": "ok"
 }

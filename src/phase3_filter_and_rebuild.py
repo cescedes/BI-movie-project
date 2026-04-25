@@ -16,13 +16,12 @@ from config import (
     DIM_MOVIE_PATH,
     DIM_DATE_PATH,
     FACT_MOVIE_MONTH_PATH,
+    STAGING_MOVIE_ACTIVITY_STATS_PATH,
+    MIN_TOTAL_RATINGS,
+    MIN_ACTIVE_MONTHS,
+    MIN_RELEASE_YEAR,
+    USE_RELEASE_YEAR_FILTER,
 )
-
-
-MIN_TOTAL_RATINGS = 20
-MIN_ACTIVE_MONTHS = 2
-MIN_RELEASE_YEAR = 2000
-USE_RELEASE_YEAR_FILTER = False
 
 
 def load_current_exports() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -150,6 +149,8 @@ def main() -> None:
     original_fact = fact_movie_month.copy()
 
     movie_stats = build_movie_activity_stats(fact_movie_month)
+    movie_stats.to_csv(STAGING_MOVIE_ACTIVITY_STATS_PATH, index=False)
+
     filtered_movies = filter_movies(dim_movie, movie_stats)
 
     final_dim_movie = finalize_dim_movie(filtered_movies)
@@ -163,6 +164,7 @@ def main() -> None:
     summary_report(original_dim_movie, original_fact, final_dim_movie, final_fact)
     validate_outputs(final_dim_movie, final_dim_date, final_fact)
 
+    print(f"\nMovie activity stats written to: {STAGING_MOVIE_ACTIVITY_STATS_PATH}")
     print("\nPhase 3 completed successfully.")
 
 
