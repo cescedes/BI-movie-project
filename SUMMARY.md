@@ -152,10 +152,8 @@ The Movie dimension contains one row per movie.
 Important attributes:
 
 - `movie_key`
-- `movie_id`
 - `title`
 - `release_year`
-- `release_period`
 - `runtime_minutes`
 - `director_name`
 - `tmdb_original_language`
@@ -422,7 +420,6 @@ Relevant columns:
 - `fact_movie_month.rating_count`
 - `dim_genre.genre_name`
 - `dim_movie.release_year`
-- `dim_movie.release_period`
 - `dim_movie.runtime_minutes`
 - `dim_date.year`
 - `dim_date.decade`
@@ -462,7 +459,6 @@ Relevant columns:
 - `dim_movie.tmdb_primary_country`
 - `dim_movie.tmdb_primary_company`
 - `dim_movie.release_year`
-- `dim_movie.release_period`
 - `dim_movie.tmdb_popularity`
 - `dim_genre.genre_name`
 

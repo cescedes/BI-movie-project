@@ -41,7 +41,6 @@ def standardize_dim_movie(dim_movie: pd.DataFrame) -> pd.DataFrame:
         "movie_key",
         "title",
         "release_year",
-        "release_period",
         "runtime_minutes",
         "director_name",
         "tmdb_original_language",
@@ -63,10 +62,6 @@ def standardize_dim_movie(dim_movie: pd.DataFrame) -> pd.DataFrame:
 
     if "release_year" in df.columns:
         df["release_year"] = pd.to_numeric(df["release_year"], errors="coerce").astype("Int64")
-    
-    if "release_year" in df.columns:
-        df["release_period"] = (df["release_year"] // 10) * 10
-        df["release_period"] = df["release_period"].astype("Int64").astype("string") + "s"
     
     if "runtime_minutes" in df.columns:
         df["runtime_minutes"] = pd.to_numeric(df["runtime_minutes"], errors="coerce").astype("Int64")
