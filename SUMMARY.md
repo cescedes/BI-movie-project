@@ -1,4 +1,4 @@
-# BI Movie Project – Modeling and Pipeline Summary
+# BI Movie Project – Pipeline Summary
 
 ## Project focus
 
