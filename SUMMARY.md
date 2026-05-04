@@ -2,7 +2,7 @@
 
 ## Project focus
 
-The project analyzes monthly movie popularity, audience engagement, and audience reception. The final version does not include platform analysis or text-based sentiment analysis. Instead, it focuses on MovieLens rating and tag activity over time, enriched with IMDb and TMDb movie metadata.
+The project analyzes monthly movie popularity, audience engagement, and audience reception. It focuses on MovieLens rating and tag activity over time, enriched with IMDb and TMDb movie metadata.
 
 The final fact table has the grain of one movie in one month. In plain terms, each fact row answers:
 
@@ -307,7 +307,7 @@ The final warehouse consists of these files:
 
 ---
 
-## Refactored analytical questions
+## Analytical Questions
 
 ### Q1. Which movies generate the highest audience engagement over time?
 
@@ -321,9 +321,18 @@ Dimensions:
 - Movie
 - Date
 
+Relevant columns:
+
+- `fact_movie_month.rating_count`
+- `fact_movie_month.tag_count`
+- `dim_movie.title`
+- `dim_date.year_month`
+- `dim_date.year`
+- `dim_date.quarter`
+
 Benefit:
 
-This helps identify movies with strong long-term interest compared to movies that only receive short-term attention spikes. It can support catalog prioritization and promotion decisions.
+This helps identify movies with strong long-term interest compared to movies that only receive short-term attention spikes. It can support catalog prioritization and promotion decisions by showing which titles consistently attract audience activity over time.
 
 ---
 
@@ -340,45 +349,87 @@ Dimensions:
 - Genre
 - Date
 
+Relevant columns:
+
+- `fact_movie_month.rating_count`
+- `fact_movie_month.tag_count`
+- `fact_movie_month.movie_key`
+- `fact_movie_month.month_key`
+- `dim_genre.genre_name`
+- `bridge_movie_genre.movie_key`
+- `bridge_movie_genre.genre_key`
+- `dim_date.year_month`
+- `dim_date.year`
+
 Benefit:
 
-This shows which genres maintain durable audience interest over time and which genres are more short-lived.
+This shows which genres maintain durable audience interest over time and which genres are more short-lived. Since movies can belong to multiple genres, genre-level totals represent genre participation rather than mutually exclusive movie categories.
 
 ---
 
-### Q3. Are the most popular movies also the most positively received?
+### Q3. Are the most active MovieLens movies also highly rated or popular on IMDb and TMDb?
 
 Measures:
 
 - `rating_count`
 - `avg_rating`
+- `imdb_avg_rating`
+- `imdb_num_votes`
+- `tmdb_popularity`
+- `tmdb_vote_average`
+- `tmdb_vote_count`
 
 Dimensions:
 
 - Movie
 - Genre
 
+Relevant columns:
+
+- `fact_movie_month.rating_count`
+- `fact_movie_month.avg_rating`
+- `dim_movie.title`
+- `dim_movie.imdb_avg_rating`
+- `dim_movie.imdb_num_votes`
+- `dim_movie.tmdb_popularity`
+- `dim_movie.tmdb_vote_average`
+- `dim_movie.tmdb_vote_count`
+- `dim_genre.genre_name`
+
 Benefit:
 
-This helps distinguish between movies that attract a lot of attention and movies that are actually rated highly by audiences. A movie may be popular but not highly rated, or highly rated but only watched by a smaller audience.
+This helps compare MovieLens audience activity with external IMDb and TMDb indicators. It shows whether movies that receive many MovieLens ratings are also highly rated or popular in broader movie databases, and helps distinguish between high attention and high audience approval.
 
 ---
 
-### Q4. How does audience reception differ across genres and release periods?
+### Q4. How does audience reception differ across genres, release periods, and runtimes?
 
 Measures:
 
 - `avg_rating`
+- `rating_count`
 
 Dimensions:
 
 - Genre
 - Release Year / Release Period
+- Runtime
 - Date
+
+Relevant columns:
+
+- `fact_movie_month.avg_rating`
+- `fact_movie_month.rating_count`
+- `dim_genre.genre_name`
+- `dim_movie.release_year`
+- `dim_movie.release_period`
+- `dim_movie.runtime_minutes`
+- `dim_date.year`
+- `dim_date.decade`
 
 Benefit:
 
-This supports analysis of whether certain genres or movie eras tend to receive better audience ratings.
+This supports analysis of whether certain genres, movie eras, or runtime ranges tend to receive better audience ratings. It also helps compare audience reception across older and newer movies while controlling for genre and movie characteristics.
 
 ---
 
@@ -390,15 +441,31 @@ Measures:
 - `tag_count`
 - active months
 - `avg_rating`
+- `tmdb_popularity`
 
 Dimensions:
 
 - Genre
 - Director
-- Language
+- Original Language
 - Production Country
+- Production Company
 - Release Year / Release Period
+
+Relevant columns:
+
+- `fact_movie_month.rating_count`
+- `fact_movie_month.tag_count`
+- `fact_movie_month.avg_rating`
+- `dim_movie.director_name`
+- `dim_movie.tmdb_original_language`
+- `dim_movie.tmdb_primary_country`
+- `dim_movie.tmdb_primary_company`
+- `dim_movie.release_year`
+- `dim_movie.release_period`
+- `dim_movie.tmdb_popularity`
+- `dim_genre.genre_name`
 
 Benefit:
 
-This helps identify movie characteristics linked to long-term engagement and positive audience reception.
+This helps identify movie characteristics linked to long-term engagement and positive audience reception. It can support decisions about catalog curation and promotion by showing whether sustained popularity is associated with specific genres, directors, languages, countries, companies, or release periods.
