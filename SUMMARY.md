@@ -2,7 +2,7 @@
 
 ## Project focus
 
-The project analyzes monthly movie popularity, audience engagement, and audience reception. The final version does not include platform analysis or text-based sentiment analysis. Instead, it focuses on MovieLens rating and tag activity over time, enriched with IMDb and TMDb movie metadata.
+The project analyzes monthly movie popularity, audience engagement, and audience reception. It focuses on MovieLens rating and tag activity over time, enriched with IMDb and TMDb movie metadata.
 
 The final fact table has the grain of one movie in one month. In plain terms, each fact row answers:
 
