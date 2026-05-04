@@ -39,7 +39,6 @@ def standardize_dim_movie(dim_movie: pd.DataFrame) -> pd.DataFrame:
     # Keep the most useful columns for analysis
     preferred_cols = [
         "movie_key",
-        "movie_id",
         "title",
         "release_year",
         "release_period",
@@ -61,9 +60,6 @@ def standardize_dim_movie(dim_movie: pd.DataFrame) -> pd.DataFrame:
     # Ensure keys are numeric where appropriate
     if "movie_key" in df.columns:
         df["movie_key"] = pd.to_numeric(df["movie_key"], errors="coerce").astype("Int64")
-
-    if "movie_id" in df.columns:
-        df["movie_id"] = pd.to_numeric(df["movie_id"], errors="coerce").astype("Int64")
 
     if "release_year" in df.columns:
         df["release_year"] = pd.to_numeric(df["release_year"], errors="coerce").astype("Int64")
