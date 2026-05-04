@@ -13,6 +13,8 @@ data/exports/fact_movie_month.csv
 import pandas as pd
 
 from config import (
+    BRIDGE_MOVIE_GENRE_PATH,
+    DIM_GENRE_PATH,
     RATINGS_PATH,
     TAGS_PATH,
     MOVIES_PATH,
@@ -24,8 +26,7 @@ from config import (
     DIM_MOVIE_PATH,
     FACT_MOVIE_MONTH_PATH,
 )
-from utils import ensure_directories, unix_to_month_start, parse_primary_genre, safe_int_key
-
+from utils import ensure_directories, unix_to_month_start, safe_int_key
 
 def load_movielens_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     ratings = pd.read_csv(
@@ -64,8 +65,6 @@ def prepare_movies_dimension(movies: pd.DataFrame, links: pd.DataFrame) -> pd.Da
 
     dim_movie = movies.merge(links, on="movieId", how="left")
 
-    dim_movie["primary_genre"] = dim_movie["genres"].apply(parse_primary_genre)
-
     # Basic release year extraction from title, e.g. "Toy Story (1995)"
     dim_movie["release_year"] = (
         dim_movie["title"]
@@ -84,7 +83,6 @@ def prepare_movies_dimension(movies: pd.DataFrame, links: pd.DataFrame) -> pd.Da
             "movie_id",
             "title",
             "genres",
-            "primary_genre",
             "release_year",
             "imdbId",
             "tmdbId",
@@ -93,6 +91,43 @@ def prepare_movies_dimension(movies: pd.DataFrame, links: pd.DataFrame) -> pd.Da
 
     return dim_movie
 
+
+def build_genre_tables(dim_movie: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    movie_genres = (
+        dim_movie[["movie_key", "genres"]]
+        .dropna(subset=["genres"])
+        .assign(genre_name=lambda df: df["genres"].str.split("|"))
+        .explode("genre_name")
+    )
+
+    movie_genres["genre_name"] = movie_genres["genre_name"].astype("string").str.strip()
+
+    movie_genres = movie_genres[
+        movie_genres["genre_name"].notna()
+        & (movie_genres["genre_name"] != "")
+        & (movie_genres["genre_name"] != "(no genres listed)")
+    ].copy()
+
+    dim_genre = (
+        movie_genres[["genre_name"]]
+        .drop_duplicates()
+        .sort_values("genre_name")
+        .reset_index(drop=True)
+    )
+
+    dim_genre["genre_key"] = range(1, len(dim_genre) + 1)
+    dim_genre = dim_genre[["genre_key", "genre_name"]]
+
+    bridge_movie_genre = (
+        movie_genres
+        .merge(dim_genre, on="genre_name", how="left")
+        [["movie_key", "genre_key"]]
+        .drop_duplicates()
+        .sort_values(["movie_key", "genre_key"])
+        .reset_index(drop=True)
+    )
+
+    return dim_genre, bridge_movie_genre
 
 def aggregate_ratings_monthly(ratings: pd.DataFrame) -> pd.DataFrame:
     ratings = ratings.copy()
@@ -144,7 +179,6 @@ def build_monthly_staging(
                 "movie_key",
                 "title",
                 "genres",
-                "primary_genre",
                 "release_year",
                 "imdbId",
                 "tmdbId",
@@ -165,7 +199,6 @@ def build_monthly_staging(
             "tag_count",
             "title",
             "genres",
-            "primary_genre",
             "release_year",
             "imdbId",
             "tmdbId",
@@ -229,6 +262,8 @@ def main() -> None:
     ratings, tags, movies, links = load_movielens_data()
 
     dim_movie = prepare_movies_dimension(movies, links)
+    dim_genre, bridge_movie_genre = build_genre_tables(dim_movie)
+
     ratings_monthly = aggregate_ratings_monthly(ratings)
     tags_monthly = aggregate_tags_monthly(tags)
 
@@ -238,6 +273,8 @@ def main() -> None:
 
     monthly.to_csv(STAGING_MONTHLY_PATH, index=False)
     dim_movie.to_csv(DIM_MOVIE_PATH, index=False)
+    dim_genre.to_csv(DIM_GENRE_PATH, index=False)
+    bridge_movie_genre.to_csv(BRIDGE_MOVIE_GENRE_PATH, index=False)
     dim_date.to_csv(DIM_DATE_PATH, index=False)
     fact_movie_month.to_csv(FACT_MOVIE_MONTH_PATH, index=False)
 
@@ -245,6 +282,8 @@ def main() -> None:
     print(f"Rows in dim_movie: {len(dim_movie):,}")
     print(f"Rows in dim_date: {len(dim_date):,}")
     print(f"Rows in fact_movie_month: {len(fact_movie_month):,}")
+    print(f"Rows in dim_genre: {len(dim_genre):,}")
+    print(f"Rows in bridge_movie_genre: {len(bridge_movie_genre):,}")
 
 
 if __name__ == "__main__":

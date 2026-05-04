@@ -15,6 +15,8 @@ import pandas as pd
 from config import (
     DIM_MOVIE_PATH,
     DIM_DATE_PATH,
+    DIM_GENRE_PATH,
+    BRIDGE_MOVIE_GENRE_PATH,
     FACT_MOVIE_MONTH_PATH,
     STAGING_MOVIE_ACTIVITY_STATS_PATH,
     MIN_TOTAL_RATINGS,
@@ -23,13 +25,14 @@ from config import (
     USE_RELEASE_YEAR_FILTER,
 )
 
-
-def load_current_exports() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def load_current_exports() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     dim_movie = pd.read_csv(DIM_MOVIE_PATH)
     dim_date = pd.read_csv(DIM_DATE_PATH)
+    dim_genre = pd.read_csv(DIM_GENRE_PATH)
+    bridge_movie_genre = pd.read_csv(BRIDGE_MOVIE_GENRE_PATH)
     fact_movie_month = pd.read_csv(FACT_MOVIE_MONTH_PATH)
 
-    return dim_movie, dim_date, fact_movie_month
+    return dim_movie, dim_date, dim_genre, bridge_movie_genre, fact_movie_month
 
 
 def build_movie_activity_stats(fact_movie_month: pd.DataFrame) -> pd.DataFrame:
@@ -97,6 +100,27 @@ def filter_date_dimension(
     return dim_date_filtered
 
 
+def filter_genre_tables(
+    dim_genre: pd.DataFrame,
+    bridge_movie_genre: pd.DataFrame,
+    kept_movie_keys: pd.Series,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    bridge_filtered = bridge_movie_genre[
+        bridge_movie_genre["movie_key"].isin(kept_movie_keys)
+    ].copy()
+
+    used_genre_keys = bridge_filtered["genre_key"].dropna().unique()
+
+    dim_genre_filtered = dim_genre[
+        dim_genre["genre_key"].isin(used_genre_keys)
+    ].copy()
+
+    bridge_filtered = bridge_filtered.sort_values(["movie_key", "genre_key"]).reset_index(drop=True)
+    dim_genre_filtered = dim_genre_filtered.sort_values("genre_key").reset_index(drop=True)
+
+    return dim_genre_filtered, bridge_filtered
+
+
 def finalize_dim_movie(filtered_movies: pd.DataFrame) -> pd.DataFrame:
     keep_cols = [col for col in filtered_movies.columns if col not in {
         "total_ratings", "total_tags", "active_months", "avg_monthly_rating"
@@ -111,10 +135,19 @@ def finalize_dim_movie(filtered_movies: pd.DataFrame) -> pd.DataFrame:
 def validate_outputs(
     dim_movie: pd.DataFrame,
     dim_date: pd.DataFrame,
+    dim_genre: pd.DataFrame,
+    bridge_movie_genre: pd.DataFrame,
     fact_movie_month: pd.DataFrame,
 ) -> None:
     dupes = fact_movie_month.duplicated(subset=["movie_key", "month_key"]).sum()
+    bridge_dupes = bridge_movie_genre.duplicated(subset=["movie_key", "genre_key"]).sum()
 
+    valid_movie_keys = set(dim_movie["movie_key"].dropna())
+    valid_genre_keys = set(dim_genre["genre_key"].dropna())
+
+    orphan_bridge_movies = (~bridge_movie_genre["movie_key"].isin(valid_movie_keys)).sum()
+    orphan_bridge_genres = (~bridge_movie_genre["genre_key"].isin(valid_genre_keys)).sum()
+    
     print("\nValidation")
     print("-" * 30)
     print(f"Duplicate fact grain rows: {dupes}")
@@ -123,6 +156,11 @@ def validate_outputs(
     print(f"Movies in dim_movie: {len(dim_movie):,}")
     print(f"Months in dim_date: {len(dim_date):,}")
     print(f"Rows in fact_movie_month: {len(fact_movie_month):,}")
+    print(f"Duplicate bridge rows: {bridge_dupes}")
+    print(f"Bridge rows with missing movie key: {orphan_bridge_movies}")
+    print(f"Bridge rows with missing genre key: {orphan_bridge_genres}")
+    print(f"Genres in dim_genre: {len(dim_genre):,}")
+    print(f"Rows in bridge_movie_genre: {len(bridge_movie_genre):,}")
 
 
 def summary_report(
@@ -143,7 +181,7 @@ def summary_report(
 
 
 def main() -> None:
-    dim_movie, dim_date, fact_movie_month = load_current_exports()
+    dim_movie, dim_date, dim_genre, bridge_movie_genre, fact_movie_month = load_current_exports()
 
     original_dim_movie = dim_movie.copy()
     original_fact = fact_movie_month.copy()
@@ -156,13 +194,26 @@ def main() -> None:
     final_dim_movie = finalize_dim_movie(filtered_movies)
     final_fact = filter_fact_table(fact_movie_month, final_dim_movie["movie_key"])
     final_dim_date = filter_date_dimension(dim_date, final_fact)
+    final_dim_genre, final_bridge_movie_genre = filter_genre_tables(
+        dim_genre,
+        bridge_movie_genre,
+        final_dim_movie["movie_key"],
+    )
 
     final_dim_movie.to_csv(DIM_MOVIE_PATH, index=False)
     final_dim_date.to_csv(DIM_DATE_PATH, index=False)
+    final_dim_genre.to_csv(DIM_GENRE_PATH, index=False)
+    final_bridge_movie_genre.to_csv(BRIDGE_MOVIE_GENRE_PATH, index=False)
     final_fact.to_csv(FACT_MOVIE_MONTH_PATH, index=False)
 
     summary_report(original_dim_movie, original_fact, final_dim_movie, final_fact)
-    validate_outputs(final_dim_movie, final_dim_date, final_fact)
+    validate_outputs(
+        final_dim_movie,
+        final_dim_date,
+        final_dim_genre,
+        final_bridge_movie_genre,
+        final_fact,
+    )
 
     print(f"\nMovie activity stats written to: {STAGING_MOVIE_ACTIVITY_STATS_PATH}")
     print("\nPhase 3 completed successfully.")

@@ -18,6 +18,7 @@ TAGS_PATH = RAW_MOVIELENS_DIR / "tags.csv"
 MOVIES_PATH = RAW_MOVIELENS_DIR / "movies.csv"
 LINKS_PATH = RAW_MOVIELENS_DIR / "links.csv"
 
+
 TITLE_BASICS_PATH = RAW_IMDB_DIR / "title.basics.tsv.gz"
 TITLE_RATINGS_PATH = RAW_IMDB_DIR / "title.ratings.tsv.gz"
 TITLE_CREW_PATH = RAW_IMDB_DIR / "title.crew.tsv.gz"
@@ -29,6 +30,8 @@ STAGING_TMDB_MOVIES_PATH = STAGING_DIR / "tmdb_movies.csv"
 DIM_DATE_PATH = EXPORT_DIR / "dim_date.csv"
 DIM_MOVIE_PATH = EXPORT_DIR / "dim_movie.csv"
 FACT_MOVIE_MONTH_PATH = EXPORT_DIR / "fact_movie_month.csv"
+DIM_GENRE_PATH = EXPORT_DIR / "dim_genre.csv"
+BRIDGE_MOVIE_GENRE_PATH = EXPORT_DIR / "bridge_movie_genre.csv"
 
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
@@ -37,6 +40,8 @@ FINAL_DIR = DATA_DIR / "final"
 FINAL_DIM_DATE_PATH = FINAL_DIR / "dim_date.csv"
 FINAL_DIM_MOVIE_PATH = FINAL_DIR / "dim_movie.csv"
 FINAL_FACT_MOVIE_MONTH_PATH = FINAL_DIR / "fact_movie_month.csv"
+FINAL_DIM_GENRE_PATH = FINAL_DIR / "dim_genre.csv"
+FINAL_BRIDGE_MOVIE_GENRE_PATH = FINAL_DIR / "bridge_movie_genre.csv"
 
 # Analysis / filtering configuration
 MIN_TOTAL_RATINGS = 20

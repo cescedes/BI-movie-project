@@ -10,20 +10,27 @@ import pandas as pd
 from config import (
     DIM_DATE_PATH,
     DIM_MOVIE_PATH,
+    DIM_GENRE_PATH,
+    BRIDGE_MOVIE_GENRE_PATH,
     FACT_MOVIE_MONTH_PATH,
     FINAL_DIR,
     FINAL_DIM_DATE_PATH,
     FINAL_DIM_MOVIE_PATH,
+    FINAL_DIM_GENRE_PATH,
+    FINAL_BRIDGE_MOVIE_GENRE_PATH,
     FINAL_FACT_MOVIE_MONTH_PATH,
 )
 from utils import ensure_directories
 
 
-def load_exports() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def load_exports() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     dim_date = pd.read_csv(DIM_DATE_PATH)
     dim_movie = pd.read_csv(DIM_MOVIE_PATH)
+    dim_genre = pd.read_csv(DIM_GENRE_PATH)
+    bridge_movie_genre = pd.read_csv(BRIDGE_MOVIE_GENRE_PATH)
     fact_movie_month = pd.read_csv(FACT_MOVIE_MONTH_PATH)
-    return dim_date, dim_movie, fact_movie_month
+
+    return dim_date, dim_movie, dim_genre, bridge_movie_genre, fact_movie_month
 
 
 def standardize_dim_movie(dim_movie: pd.DataFrame) -> pd.DataFrame:
@@ -34,32 +41,18 @@ def standardize_dim_movie(dim_movie: pd.DataFrame) -> pd.DataFrame:
         "movie_key",
         "movie_id",
         "title",
-        "primary_genre",
-        "genres",
         "release_year",
-        "imdbId",
-        "imdb_tconst",
-        "tmdbId",
-        "title_type",
-        "is_adult",
+        "release_period",
         "runtime_minutes",
-        "imdb_start_year",
-        "imdb_genres",
+        "director_name",
+        "tmdb_original_language",
+        "tmdb_primary_country",
+        "tmdb_primary_company",
         "imdb_avg_rating",
         "imdb_num_votes",
-        "director_name",
-        "effective_genres",
-        "tmdb_title",
-        "tmdb_release_date",
-        "tmdb_original_language",
         "tmdb_popularity",
-        "tmdb_budget",
-        "tmdb_revenue",
-        "tmdb_status",
         "tmdb_vote_average",
         "tmdb_vote_count",
-        "tmdb_primary_company",
-        "tmdb_primary_country",
     ]
 
     existing_cols = [c for c in preferred_cols if c in df.columns]
@@ -74,7 +67,11 @@ def standardize_dim_movie(dim_movie: pd.DataFrame) -> pd.DataFrame:
 
     if "release_year" in df.columns:
         df["release_year"] = pd.to_numeric(df["release_year"], errors="coerce").astype("Int64")
-
+    
+    if "release_year" in df.columns:
+        df["release_period"] = (df["release_year"] // 10) * 10
+        df["release_period"] = df["release_period"].astype("Int64").astype("string") + "s"
+    
     if "runtime_minutes" in df.columns:
         df["runtime_minutes"] = pd.to_numeric(df["runtime_minutes"], errors="coerce").astype("Int64")
 
@@ -106,6 +103,39 @@ def standardize_dim_date(dim_date: pd.DataFrame) -> pd.DataFrame:
     df = df.sort_values("month_key").drop_duplicates(subset=["month_key"]).reset_index(drop=True)
     return df
 
+def standardize_dim_genre(dim_genre: pd.DataFrame) -> pd.DataFrame:
+    df = dim_genre.copy()
+
+    df = df[["genre_key", "genre_name"]].copy()
+    df["genre_key"] = pd.to_numeric(df["genre_key"], errors="coerce").astype("Int64")
+    df["genre_name"] = df["genre_name"].astype("string").str.strip()
+
+    df = (
+        df.dropna(subset=["genre_key", "genre_name"])
+        .drop_duplicates(subset=["genre_key"])
+        .sort_values("genre_key")
+        .reset_index(drop=True)
+    )
+
+    return df
+
+
+def standardize_bridge_movie_genre(bridge_movie_genre: pd.DataFrame) -> pd.DataFrame:
+    df = bridge_movie_genre.copy()
+
+    df = df[["movie_key", "genre_key"]].copy()
+    df["movie_key"] = pd.to_numeric(df["movie_key"], errors="coerce").astype("Int64")
+    df["genre_key"] = pd.to_numeric(df["genre_key"], errors="coerce").astype("Int64")
+
+    df = (
+        df.dropna(subset=["movie_key", "genre_key"])
+        .drop_duplicates(subset=["movie_key", "genre_key"])
+        .sort_values(["movie_key", "genre_key"])
+        .reset_index(drop=True)
+    )
+
+    return df
+
 
 def standardize_fact_movie_month(fact_movie_month: pd.DataFrame) -> pd.DataFrame:
     df = fact_movie_month.copy()
@@ -130,13 +160,25 @@ def standardize_fact_movie_month(fact_movie_month: pd.DataFrame) -> pd.DataFrame
     return df
 
 
-def validate_model(dim_movie: pd.DataFrame, dim_date: pd.DataFrame, fact: pd.DataFrame) -> None:
+def validate_model(
+    dim_movie: pd.DataFrame,
+    dim_date: pd.DataFrame,
+    dim_genre: pd.DataFrame,
+    bridge_movie_genre: pd.DataFrame,
+    fact: pd.DataFrame,
+) -> None:
     duplicate_fact_rows = fact.duplicated(subset=["movie_key", "month_key"]).sum()
     null_movie_keys = fact["movie_key"].isna().sum()
     null_month_keys = fact["month_key"].isna().sum()
 
     valid_movie_keys = set(dim_movie["movie_key"].dropna().tolist())
     valid_month_keys = set(dim_date["month_key"].dropna().tolist())
+    valid_genre_keys = set(dim_genre["genre_key"].dropna().tolist())
+
+    orphan_bridge_movie_keys = (~bridge_movie_genre["movie_key"].isin(valid_movie_keys)).sum()
+    orphan_bridge_genre_keys = (~bridge_movie_genre["genre_key"].isin(valid_genre_keys)).sum()
+    duplicate_bridge_rows = bridge_movie_genre.duplicated(subset=["movie_key", "genre_key"]).sum()
+    movies_without_genre = (~dim_movie["movie_key"].isin(bridge_movie_genre["movie_key"])).sum()
 
     orphan_movie_keys = (~fact["movie_key"].isin(valid_movie_keys)).sum()
     orphan_month_keys = (~fact["month_key"].isin(valid_month_keys)).sum()
@@ -153,11 +195,13 @@ def validate_model(dim_movie: pd.DataFrame, dim_date: pd.DataFrame, fact: pd.Dat
         avg_rating_above_max = 0
 
     missing_titles = dim_movie["title"].isna().sum() if "title" in dim_movie.columns else 0
-    missing_primary_genre = dim_movie["primary_genre"].isna().sum() if "primary_genre" in dim_movie.columns else 0
 
     print("\nFinal validation")
     print("-" * 30)
     print(f"Duplicate fact grain rows: {duplicate_fact_rows}")
+    print(f"Duplicate bridge rows: {duplicate_bridge_rows}")
+    print(f"Bridge rows with missing movie dimension key: {orphan_bridge_movie_keys}")
+    print(f"Bridge rows with missing genre dimension key: {orphan_bridge_genre_keys}")
     print(f"Null movie_key in fact: {null_movie_keys}")
     print(f"Null month_key in fact: {null_month_keys}")
     print(f"Fact rows with missing movie dimension key: {orphan_movie_keys}")
@@ -167,32 +211,46 @@ def validate_model(dim_movie: pd.DataFrame, dim_date: pd.DataFrame, fact: pd.Dat
     print(f"avg_rating rows below 0.5: {avg_rating_below_min}")
     print(f"avg_rating rows above 5.0: {avg_rating_above_max}")
     print(f"Movies with missing title: {missing_titles}")
-    print(f"Movies with missing primary_genre: {missing_primary_genre}")
+    print(f"Movies without genre: {movies_without_genre}")
     print(f"Final dim_movie rows: {len(dim_movie):,}")
     print(f"Final dim_date rows: {len(dim_date):,}")
+    print(f"Final dim_genre rows: {len(dim_genre):,}")
+    print(f"Final bridge_movie_genre rows: {len(bridge_movie_genre):,}")
     print(f"Final fact rows: {len(fact):,}")
 
 
 def main() -> None:
     ensure_directories(FINAL_DIR)
 
-    dim_date, dim_movie, fact_movie_month = load_exports()
+    dim_date, dim_movie, dim_genre, bridge_movie_genre, fact_movie_month = load_exports()
 
     final_dim_movie = standardize_dim_movie(dim_movie)
     final_dim_date = standardize_dim_date(dim_date)
+    final_dim_genre = standardize_dim_genre(dim_genre)
+    final_bridge_movie_genre = standardize_bridge_movie_genre(bridge_movie_genre)
     final_fact = standardize_fact_movie_month(fact_movie_month)
 
 
     final_dim_movie.to_csv(FINAL_DIM_MOVIE_PATH, index=False)
     final_dim_date.to_csv(FINAL_DIM_DATE_PATH, index=False)
+    final_dim_genre.to_csv(FINAL_DIM_GENRE_PATH, index=False)
+    final_bridge_movie_genre.to_csv(FINAL_BRIDGE_MOVIE_GENRE_PATH, index=False)
     final_fact.to_csv(FINAL_FACT_MOVIE_MONTH_PATH, index=False)
 
-    validate_model(final_dim_movie, final_dim_date, final_fact)
+    validate_model(
+        final_dim_movie,
+        final_dim_date,
+        final_dim_genre,
+        final_bridge_movie_genre,
+        final_fact,
+    )
 
     print("\nPhase 5 completed successfully.")
     print(f"Final dim_movie written to: {FINAL_DIM_MOVIE_PATH}")
     print(f"Final dim_date written to: {FINAL_DIM_DATE_PATH}")
     print(f"Final fact written to: {FINAL_FACT_MOVIE_MONTH_PATH}")
+    print(f"Final dim_genre written to: {FINAL_DIM_GENRE_PATH}")
+    print(f"Final bridge_movie_genre written to: {FINAL_BRIDGE_MOVIE_GENRE_PATH}")
 
 
 if __name__ == "__main__":

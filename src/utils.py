@@ -13,11 +13,6 @@ def unix_to_month_start(series: pd.Series) -> pd.Series:
     month_start = dt.dt.to_period("M").dt.to_timestamp()
     return pd.Series(month_start, index=series.index, name=series.name)
 
-def parse_primary_genre(genres: str) -> str:
-    if pd.isna(genres) or genres == "(no genres listed)":
-        return "Unknown"
-    return str(genres).split("|")[0].strip()
-
 def safe_int_key(series: pd.Series) -> pd.Series:
     return pd.to_numeric(series, errors="coerce").astype("Int64")
 

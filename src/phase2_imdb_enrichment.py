@@ -158,9 +158,6 @@ def enrich_dim_movie(
     if "release_year" in df.columns:
         df["release_year"] = df["release_year"].fillna(df["imdb_start_year"])
 
-    # fallback: if MovieLens genres are weak or missing, keep them but do not overwrite
-    df["effective_genres"] = df["genres"].fillna(df["imdb_genres"])
-
     return df
 
 

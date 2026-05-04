@@ -4,7 +4,7 @@ This project builds a small movie-oriented BI warehouse for analyzing **monthly 
 
 ## Project goal
 
-The pipeline integrates public movie datasets and transforms them into a Tableau-ready warehouse with a monthly fact table and supporting dimensions. The final warehouse uses a fact table at the grain of one movie in one month, supported by Date and Movie dimensions, with additional analytical dimensions such as Genre, Director, Language, and Release Year modeled as attributes of the Movie dimension.
+The pipeline integrates public movie datasets and transforms them into a Tableau-ready warehouse with a monthly fact table and supporting dimensions. The final warehouse uses a fact table at the grain of one movie in one month. The core dimensions are Date, Movie, and Genre. Since movies can belong to multiple genres, Genre is modeled as a separate dimension connected to Movie through a bridge table. Additional analytical attributes such as Director, Language, Production Country, and Release Year are stored in the Movie dimension.
 
 ## Data sources
 
@@ -30,6 +30,8 @@ Builds the first monthly fact table and base dimensions from:
 Outputs:
 - `dim_date.csv`
 - `dim_movie.csv`
+- `dim_genre.csv`
+- `bridge_movie_genre.csv`
 - `fact_movie_month.csv`
 
 ### Phase 2 – IMDb enrichment
@@ -42,7 +44,7 @@ Enriches `dim_movie.csv` with:
 - director name
 
 ### Phase 3 – Filtering and rebuild
-Applies filtering rules to remove sparse or low-signal movies and rebuilds cleaner exports for analysis.
+Applies filtering rules to remove sparse or low-signal movies and rebuilds cleaner exports for analysis. The genre bridge table is also filtered so it only contains movies that remain in the final analysis set.
 
 ### Phase 4 – TMDb enrichment
 Fetches and caches TMDb movie details, then enriches `dim_movie.csv` with:
@@ -53,7 +55,7 @@ Fetches and caches TMDb movie details, then enriches `dim_movie.csv` with:
 - primary production country
 
 ### Phase 5 – Final export packaging
-Creates the final cleaned files for Tableau in the `data/final/` folder.
+Creates the final cleaned files for Tableau in the `data/final/` folder, including the fact table, core dimensions, and the movie-genre bridge table.
 
 ## Folder structure
 
@@ -83,6 +85,31 @@ python src/run_pipeline.py
 
 The final warehouse files are:
 
+- `data/final/fact_movie_month.csv`
 - `data/final/dim_date.csv`
 - `data/final/dim_movie.csv`
-- `data/final/fact_movie_month.csv`
+- `data/final/dim_genre.csv`
+- `data/final/bridge_movie_genre.csv`
+
+## Final schema
+
+The fact table has one row per movie per month.
+
+`fact_movie_month.csv`
+- `movie_key`
+- `month_key`
+- `rating_count`
+- `avg_rating`
+- `tag_count`
+
+`dim_date.csv`
+- Date and calendar attributes for each month.
+
+`dim_movie.csv`
+- Movie-level metadata such as title, release year, runtime, director, language, production company, and production country.
+
+`dim_genre.csv`
+- One row per genre.
+
+`bridge_movie_genre.csv`
+- Connects movies to genres. This bridge is required because one movie can belong to multiple genres.
